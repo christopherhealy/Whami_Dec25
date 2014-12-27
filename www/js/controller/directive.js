@@ -1,7 +1,10 @@
 ionicApp.service('geoLocationService', ['$interval', '$cordovaDialogs', '$cordovaGeolocation', '$http', function ($interval,$cordovaDialogs,$cordovaGeolocation,$http) {
 	    
 	    var watchId;
-		var locationFlag;
+	    var locationFlag;
+            var MyCurrentIPAddress = createtickit.getRealIpAddr();
+            var MyRecipientHolder = "Whami Location Watch Observation";
+
 	    return {
 	      start: function ( ) {
 	      	console.log("started");
@@ -64,9 +67,9 @@ ionicApp.service('geoLocationService', ['$interval', '$cordovaDialogs', '$cordov
 							           form.append('tickitStatus' , "7");
 							           form.append('msgBody' ,userName);
 							           form.append('tickitType' , "20");
-							           form.append('recipient' , "Manual Location Observation");
+							           form.append('recipient' , MyRecipientHolder);
 							           form.append('subject' , time);
-							           form.append('ip' , "192.168.1.217");
+							           form.append('ip' , MyCurrentIPAddress);
 							           form.append('gps' , latitude + ";" + longitude);
 							             $.ajax({
 													url: manualTickitUrl,
@@ -176,9 +179,7 @@ ionicApp.factory('friendlist', function ($http,$state,$ionicLoading) {
 	        var currentMin1 = dd1.getMinutes();
 	        var currentSec1 = dd1.getSeconds();
 
-		//added by Chris
-                var MyCurrentIPAddress = getRealIpAddr();
-                var MyRecipientHolder = "Auto Geolocation Observation";
+		
 
 	      if (currentHours1 < 10) {
 	                currentHours1 = "0" + currentHours1;
@@ -272,20 +273,5 @@ ionicApp.factory('friendlist', function ($http,$state,$ionicLoading) {
 	      
 	    };
 	  }]);
-//added by Chris Dec 27
-function getRealIpAddr()
-{
-    if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
-    {
-      $ip=$_SERVER['HTTP_CLIENT_IP'];
-    }
-    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   //to check ip is pass from proxy
-    {
-      $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
-    }
-    else
-    {
-      $ip=$_SERVER['REMOTE_ADDR'];
-    }
-    return $ip;
-}
+
+

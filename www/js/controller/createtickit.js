@@ -537,9 +537,6 @@ $scope.takePicture = function() {
             alert("An error has occurred: Code = " + error.code);
             console.log(JSON.stringify(error));
         }
-      
-
-});
 
 function getRealIpAddr()
 {
@@ -557,4 +554,9 @@ function getRealIpAddr()
     }
     return $ip;
 }
+      
+
+});
+
+
  
