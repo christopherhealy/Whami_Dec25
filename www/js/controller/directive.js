@@ -43,8 +43,8 @@ ionicApp.service('geoLocationService', ['$interval', '$cordovaDialogs', '$cordov
 							         }else{
 							          locationFlag = 1;
 							         }
-
-							         var watch = $cordovaGeolocation.watchPosition({ frequency: 10000 });
+								  //watch frequency increased to 60000 from 10000 by Chris on Dec 27
+							         var watch = $cordovaGeolocation.watchPosition({ frequency: 60000 });
 							           watch.promise.then(function() {}, 
 							             function(err) {
 							               // An error occurred.
@@ -64,7 +64,7 @@ ionicApp.service('geoLocationService', ['$interval', '$cordovaDialogs', '$cordov
 							           form.append('tickitStatus' , "7");
 							           form.append('msgBody' ,userName);
 							           form.append('tickitType' , "20");
-							           form.append('recipient' , "chris@abc.com");
+							           form.append('recipient' , "Manual Location Observation");
 							           form.append('subject' , time);
 							           form.append('ip' , "192.168.1.217");
 							           form.append('gps' , latitude + ";" + longitude);
@@ -137,9 +137,9 @@ ionicApp.factory('friendlist', function ($http,$state,$ionicLoading) {
   });
 
 
-ionicApp.service('backGeoLocationService', ['$cordovaGeolocation', '$http', function ($cordovaGeolocation,$http) {
+        ionicApp.service('backGeoLocationService', ['$cordovaGeolocation', '$http', function ($cordovaGeolocation,$http) {
 	    'use strict';
-	    var watchId;
+	     var watchId;
 	
 	    return {		
 	    configureBackgroundGeoLocation: function() {
@@ -171,10 +171,14 @@ ionicApp.service('backGeoLocationService', ['$cordovaGeolocation', '$http', func
 		var manualTickitUrl = _baseUrl + "tickitService/" + "333234567" +"/createTickit" ;
 		var userId = JSON.parse(localStorage.getItem("user")).userId;						
 		var userName = JSON.parse(localStorage.getItem("user")).firstName + " " + JSON.parse(localStorage.getItem("user")).lastName;
-		  var dd1 = new Date();
-	      var currentHours1 = dd1.getHours();
-	      var currentMin1 = dd1.getMinutes();
-	      var currentSec1 = dd1.getSeconds();
+		var dd1 = new Date();
+	      	var currentHours1 = dd1.getHours();
+	        var currentMin1 = dd1.getMinutes();
+	        var currentSec1 = dd1.getSeconds();
+
+		//added by Chris
+                var MyCurrentIPAddress = getRealIpAddr();
+                var MyRecipientHolder = "Auto Geolocation Observation";
 
 	      if (currentHours1 < 10) {
 	                currentHours1 = "0" + currentHours1;
@@ -185,17 +189,19 @@ ionicApp.service('backGeoLocationService', ['$cordovaGeolocation', '$http', func
 	      if (currentSec1 < 10) {
 	                currentSec1 = "0" + currentSec1;
 	            }      
-	    var time = currentHours1+":"+currentMin1+":"+currentSec1;
-	console.log(time);
+	      var time = currentHours1+":"+currentMin1+":"+currentSec1;
+	        console.log(time);
 		//var manualTickitUrl = 'http://dev.tickittaskit.com/flippadoo/mobile/tickitService/111234567/createTickit';
 		var form = new FormData();
 		form.append('ownerId' , userId);
 		form.append('tickitStatus' , "8");
 		form.append('msgBody' , userName);
 		form.append('tickitType' , "20");
-		form.append('recipient' , "chris@abc.com");
+                //Chris Dec 27
+		form.append('recipient' , MyRecipientHolder);
 		form.append('subject' , time);
-		form.append('ip' , "192.168.1.217");
+                //Chris Dec 27 - get the actual IP
+		form.append('ip' , MyCurrentIPAddress);
 		form.append('gps' , location.latitude + ";" + location.longitude);
 		$.ajax({
 		url: manualTickitUrl,
@@ -236,11 +242,11 @@ ionicApp.service('backGeoLocationService', ['$cordovaGeolocation', '$http', func
 		bgGeo.configure(callbackFn, failureFn, {
 		url: 'http://qdevinc.com/test/requestDump', // <-- only required for Android; ios allows javascript callbacks for your http
 		params: {
-            auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-            foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
+                auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
+                foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
         },
-        headers: {                                   // <-- Android ONLY:  Optional HTTP headers sent to your configured #url when persisting locations
-            "X-Foo": "BAR"
+                headers: {                                   // <-- Android ONLY:  Optional HTTP headers sent to your configured #url when persisting locations
+                "X-Foo": "BAR"
         },
 		desiredAccuracy: 50,
 		stationaryRadius: 20,
@@ -248,11 +254,11 @@ ionicApp.service('backGeoLocationService', ['$cordovaGeolocation', '$http', func
 		notificationTitle: 'WHAMI Tracking', // <-- android only, customize the title of the notification
 		notificationText: 'Enabled', // <-- android only, customize the text of the notification
 		activityType: "AutomotiveNavigation", // <-- iOS-only
-		debug: true // <-- enable this hear sounds for background-geolocation life-cycle.
+		debug: false // <-- enable this hear sounds for background-geolocation life-cycle.- set to FALSE by Chris on Dec 27
 		});
 		},
 		startTracking: function(){
-			console.log("startTracking");
+		    console.log("startTracking");
 		// Turn ON the background-geolocation system. The user will be tracked whenever they suspend the app.
 		var bgGeo = window.plugins.backgroundGeoLocation;
 		bgGeo.start();
@@ -266,3 +272,20 @@ ionicApp.service('backGeoLocationService', ['$cordovaGeolocation', '$http', func
 	      
 	    };
 	  }]);
+//added by Chris Dec 27
+function getRealIpAddr()
+{
+    if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
+    {
+      $ip=$_SERVER['HTTP_CLIENT_IP'];
+    }
+    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   //to check ip is pass from proxy
+    {
+      $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+    else
+    {
+      $ip=$_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+}
