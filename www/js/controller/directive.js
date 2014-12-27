@@ -2,7 +2,8 @@ ionicApp.service('geoLocationService', ['$interval', '$cordovaDialogs', '$cordov
 	    
 	    var watchId;
 	    var locationFlag;
-            var MyCurrentIPAddress = createtickit.getRealIpAddr();
+            //var MyCurrentIPAddress = createtickit.getRealIpAddr();
+            var MyCurrentIPAddress = "101.101.101";
             var MyRecipientHolder = "Whami Location Watch Observation";
 
 	    return {
