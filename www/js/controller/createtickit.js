@@ -7,9 +7,6 @@ ionicApp.controller('createTickitCtrl', function($scope,$interval,$http,$state, 
  $scope.statussucess = false;
  $scope.stausFail = false;
 
-var MyCurrentIPAddress = getRealIpAddr();
-var MyRecipientHolder = "Whami Manual Location Observation";
-
 function statusTimeDisplay(){
  var dd1 = new Date();
       var currentHours1 = dd1.getHours();
@@ -294,11 +291,13 @@ $scope.profileData = JSON.parse(localStorage.getItem("user"));
 $scope.imageAvailable = false;
 $scope.takePicture = function() {
 //	alert("take it");
-        var options = { 
+    var options = { 
         quality : 100, 
         destinationType : Camera.DestinationType.FILE_URI, 
         sourceType : Camera.PictureSourceType.CAMERA, 
         encodingType: Camera.EncodingType.JPEG,
+        //targetWidth: 100,
+        //targetHeight: 100,
         popoverOptions: CameraPopoverOptions,
         saveToPhotoAlbum: true,
         correctOrientation: true
@@ -360,12 +359,14 @@ $scope.takePicture = function() {
 
 
         $cordovaGeolocation.getCurrentPosition({maximumAge: 7000, timeout: 15000, enableHighAccuracy: true}).then(function(position) {
-                             console.log("Your Locations ");
+                         console.log("Your Locations ");
                              console.log("Your latitude is " + position.coords.latitude);
                              var locationCord = position.coords.latitude + ";" + position.coords.longitude;
                              var options = new FileUploadOptions();
                                   options.fileKey="tickitFile";
                                   options.fileName=imageData.substr(imageData.lastIndexOf('/')+1);
+                                 // options.fileName="Ashish";
+                                  //options.mimeType = "multipart/form-data";
                                   options.contentType = "multipart/form-data";
                                   options.chunkedMode = false;
                                   options.mimeType="image/jpeg";
@@ -388,12 +389,17 @@ $scope.takePicture = function() {
                                                   params.ownerId = userId;
                                                   params.tickitStatus = tickitStatus;
                                                   params.tickitType = 20;
-                                                  params.recipient = MyRecipientHolder;
+                                                  params.recipient = "chris@abc.com";
                                                   params.subject = subject;
-                                                  params.ip = MyCurrentIPAddress;
+                                                  params.ip = "192.168.1.217";
+                                                  //params.tickitCustomId = "55555";
+                                                  //params.parentId = "null";
                                                   params.msgBody = msgBody;
-                                                  params.gps =  locationCord;                                              
-                                                                                                   
+                                                  params.gps =  locationCord;
+                                                  
+                                                  //params.startDate = null;
+                                                  //params.endDate = null;
+                                                  
                               
                                    options.params =  params;
 
@@ -468,17 +474,15 @@ $scope.takePicture = function() {
     var textapiKeyValue = JSON.parse(localStorage.getItem("user")).apiKey;
     var manualTickitUrl = _baseUrl + "tickitService/" + textapiKeyValue +"/createTickit" ;
     
-    
     var form = new FormData();
     
            form.append('ownerId' , userId);
            form.append('tickitStatus' , tickitStatus);
            form.append('msgBody' , msgBody);
            form.append('tickitType' , "20");
-           form.append('recipient' , MyRecipientHolder);
+           form.append('recipient' , "chris@abc.com");
            form.append('subject' , subject);
-           //chris on Dec 27
-           form.append('ip' , MyCurrentIPAddress);
+           form.append('ip' , "192.168.1.217");
            form.append('gps' , latitudeManual + ";" + longitudeManual);
            $scope.$parent.showLoader();
              $.ajax({
@@ -537,26 +541,7 @@ $scope.takePicture = function() {
             alert("An error has occurred: Code = " + error.code);
             console.log(JSON.stringify(error));
         }
-
-function getRealIpAddr()
-{
-    if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
-    {
-      $ip=$_SERVER['HTTP_CLIENT_IP'];
-    }
-    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   //to check ip is pass from proxy
-    {
-      $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
-    }
-    else
-    {
-      $ip=$_SERVER['REMOTE_ADDR'];
-    }
-    return $ip;
-}
       
 
 });
-
-
  
